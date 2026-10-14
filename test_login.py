@@ -1,5 +1,5 @@
 from faker import Faker
-from playwright.sync_api import Page, expect
+from playwright.sync_api import Page
 
 fake = Faker()
 
@@ -12,7 +12,7 @@ def test_invalid_login(page: Page):
     password = fake.password()
 
     page.goto(BASE_URL)
-    page.get_by_role('link', name='Login').click()  # использовал другой поиск по роли для практики
+    page.get_by_role('link', name='Login').click()
     page.get_by_test_id('login-username').fill(username)
     page.get_by_test_id('login-password').fill(password)
     page.get_by_test_id('login-submit').click()
@@ -24,6 +24,11 @@ def test_invalid_login(page: Page):
 
     error = page.get_by_test_id("login-error-inline")
     error.wait_for(state='visible')
-    expect(error).to_have_text(EXPECTED_ERROR)
+
+    page.wait_for_function(
+        "selector => document.querySelector(selector)?.textContent.trim() !== ''",
+        arg="[data-testid='login-error-inline']"
+    )
+
     actual_text = error.text_content()
     assert actual_text == EXPECTED_ERROR, f'Ожидалось: {EXPECTED_ERROR!r}, получено: {actual_text!r}'
