@@ -22,13 +22,10 @@ def test_invalid_login(page: Page):
     is_visible = spinner.is_visible()
     assert is_visible, f"Спиннер не появился. Actual result: {is_visible}, Expected result: True"
 
-    error = page.get_by_test_id("login-error-inline")
+    error = page.locator("[data-testid='login-error-inline']:not(:empty)")
     error.wait_for(state='visible')
-
-    page.wait_for_function(
-        "selector => document.querySelector(selector)?.textContent.trim() !== ''",
-        arg="[data-testid='login-error-inline']"
-    )
+    actual_text = error.text_content()
+    assert actual_text == EXPECTED_ERROR, f'Ожидалось: {EXPECTED_ERROR!r}, получено: {actual_text!r}'
 
     actual_text = error.text_content()
     assert actual_text == EXPECTED_ERROR, f'Ожидалось: {EXPECTED_ERROR!r}, получено: {actual_text!r}'
