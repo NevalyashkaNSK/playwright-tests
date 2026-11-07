@@ -18,6 +18,7 @@ class SearchResultsPage(BasePage):
     def apply_filter(self, filter_type: FilterType):
         self.filter_dropdown.select_option(label=filter_type.value)
         self.apply_button.click()
+        self.loader.wait_for(state="visible")
         self.loader.wait_for(state="hidden")
 
     def get_prices(self, n: int):
@@ -25,6 +26,6 @@ class SearchResultsPage(BasePage):
         for i in range(n):
             element = self.price_elements.nth(i)
             raw_price = element.get_attribute("data-price")
-            price = float(raw_price) / 100.0
+            price = int(raw_price)
             prices.append(price)
         return prices
